@@ -5,6 +5,466 @@ import React, { useEffect, useMemo, useState } from "react";
 // It replaces the earlier standalone-HTML version that caused a syntax error
 // (the DOCTYPE/HTML tags are invalid inside a TSX/JSX module).
 
+// ---------------- DATA (MOVED OUTSIDE COMPONENT) ----------------
+type Passage = {
+  title: string;
+  text: string;
+  shorts: [string, string, string];
+  extended: string;
+};
+
+// 20 Narrative Passages
+const narrative: Passage[] = [
+  // --- Original 10 ---
+  {
+    title: "The Library Drone",
+    text: "Each morning, the drone buzzed through the school library, returning books that had gone missing. It could recognise handwriting, sort books by smell, and whisper overdue reminders through the vents. No one questioned how it knew who borrowed what—until one day it returned a book that no one remembered writing.",
+    shorts: [
+      "What makes the library drone unusual?",
+      "How does the story create mystery?",
+      "Why might a book appear that no one remembers writing?",
+    ],
+    extended:
+      "Write 100–120 words describing how technology can become part of our imagination. Use details from the story.",
+  },
+  {
+    title: "The Night Janitor (Model J-3)",
+    text: "The museum hired a cleaning robot to polish the floors after closing. Model J-3 moved like a patient stingray, gliding beneath the glass cases. Its sensors mapped every corner except the dark patch near the meteorite display. On Wednesday night, the security guard watched J-3 pause there, as if listening. In the morning, the floor shone everywhere else, but around the meteorite were tiny footprints the size of sunflower seeds, circling the base.",
+    shorts: [
+      "What unusual detail makes the scene mysterious?",
+      "Explain why J-3 might avoid the patch near the meteorite.",
+      "Name one word or phrase that helps create the mood.",
+    ],
+    extended:
+      "Write 100–120 words debating whether the guard should report J‑3’s behaviour or keep observing. Give reasons for your choice.",
+  },
+  {
+    title: "The Book Vending Machine",
+    text: "When the old tuckshop closed for the term, the principal wheeled in a bright blue vending machine. Instead of lemonade cans, it was filled with little books wrapped in paper. The only way to unlock a book was to earn a golden token from a teacher. By recess a crowd formed, guessing the hidden titles. No one noticed the tiny camera in the corner until it blinked.",
+    shorts: [
+      "What is the main idea in one sentence?",
+      "Find a word/phrase that suggests the machine might be more than a regular machine.",
+      "Why might the machine drop a book without a token?",
+    ],
+    extended:
+      "Write 100–120 words exploring whether rewards (like tokens) make reading more exciting or less authentic. Use an example from your experience.",
+  },
+  {
+    title: "The Clock in the Attic",
+    text: "When Maya wound the clock, the house changed. The air smelled like her grandmother’s perfume, and the photos on the wall showed people she didn’t recognise. Each tick echoed like a heartbeat—faster, louder. Maya realised the hands didn’t mark hours: they marked memories, and one of them wasn’t hers.",
+    shorts: [
+      "What changes when Maya winds the clock?",
+      "How does the author create tension?",
+      "Why might the clock control memories?",
+    ],
+    extended:
+      "Write 100–120 words explaining how objects can hold memories or emotions. Use details from the passage.",
+  },
+  {
+    title: "Under the Oval",
+    text: "During sports practice, the ground under Liam’s feet trembled. A hatch had appeared beneath the goalposts. Inside, a tunnel glowed blue. He crawled in, expecting dirt walls. Instead, there were metal panels labelled ‘Week 42’. His name was written underneath in tiny letters.",
+    shorts: [
+      "What detail makes the story mysterious?",
+      "Why might Liam’s name be written there?",
+      "Predict what will happen next and justify your idea.",
+    ],
+    extended:
+      "In 100–120 words, describe what Liam might discover if he explores further. Use sensory details.",
+  },
+  {
+    title: "The Whispering Backpack",
+    text: "Zara’s backpack began whispering during maths class. It told her which answers were right before she finished the problem. By lunch, it started giving life advice—some good, some strange. When it whispered ‘don’t go home tonight’, she zipped it shut and wondered who had programmed it.",
+    shorts: [
+      "What makes this story unusual?",
+      "How does the backpack’s behaviour change?",
+      "Why does Zara feel uneasy by the end?",
+    ],
+    extended:
+      "Write 100–120 words exploring whether technology that ‘helps’ us can also control us. Use examples from the story.",
+  },
+  {
+    title: "The Dream Ticket",
+    text: "At the funfair, Leo won a golden ticket that read: ‘Redeem for One Real Dream’. That night he placed it under his pillow. When he woke, his dream had spilled into his room—rainbow sand, distant music, and a creature watching him from the window.",
+    shorts: [
+      "What makes the dream seem real?",
+      "What emotions might Leo feel?",
+      "Why is the creature significant?",
+    ],
+    extended:
+      "Write 100–120 words explaining whether dreams can reveal what we really want. Use details from the text.",
+  },
+  {
+    title: "The Substitute",
+    text: "When the relief teacher arrived, no one recognised her. She called everyone by their nicknames, solved equations without writing them down, and drew a chalk door on the board that smelled of eucalyptus. When the bell rang, she stepped through it and vanished.",
+    shorts: [
+      "What clues suggest the substitute isn’t ordinary?",
+      "What mood does the ending create?",
+      "Why might she have visited the class?",
+    ],
+    extended:
+      "In 100–120 words, describe what lesson the students might have learned from the substitute’s visit.",
+  },
+  {
+    title: "The Sky Painter",
+    text: "A girl on the mountain painted clouds with colours that changed the weather. When she used too much blue, the town flooded. When she tried yellow, crops grew overnight. One morning, she woke to find the sky blank—someone had stolen her brush.",
+    shorts: [
+      "What power does the painter have?",
+      "What problems does her art cause?",
+      "Why is the missing brush important?",
+    ],
+    extended:
+      "Write 100–120 words describing how creativity can both build and destroy. Use examples from the story.",
+  },
+  {
+    title: "The Forgotten Playground",
+    text: "Behind the new school building stood an old playground, fenced off and covered in vines. At sunset, the swings began to move on their own. A faint laughter echoed—children from a time before the school existed. Each night, one more vine disappeared.",
+    shorts: [
+      "What evidence suggests the playground is haunted?",
+      "Why might the laughter grow stronger?",
+      "How does the author build suspense?",
+    ],
+    extended:
+      "Write 100–120 words explaining whether the playground should be reopened. Use evidence from the story.",
+  },
+  // --- New 10 ---
+  {
+    title: "The Empathy Filter",
+    text: "A new app filters all incoming messages to remove anger. At first, the world seemed peaceful. Then, users realised it was also filtering out passion, urgency, and warnings. Sarah disabled it just in time to receive a single, unfiltered message: 'Don't get on the bus.'",
+    shorts: [
+      "What was the app's intended purpose?",
+      "What was the negative side-effect of the filter?",
+      "How does the author create tension in the final sentence?",
+    ],
+    extended:
+      "Write 100–120 words discussing whether it is always better to know the truth, even if it is unpleasant.",
+  },
+  {
+    title: "The Glitch in the Lift",
+    text: "The lift in the new apartment building had a 'Floor 13,' but the button was just a blank silver space. If you pressed it at exactly midnight, the lift didn't go up or down. The doors opened again to the same lobby, but no one was there, and all the clocks were stopped at 12:00.",
+    shorts: [
+      "What is the mystery of the lift?",
+      "What details show the 'other' lobby is different?",
+      "Why might someone be afraid to step out of the lift?",
+    ],
+    extended:
+      "In 100–120 words, describe what might happen if you stepped out of the lift into the silent lobby.",
+  },
+  {
+    title: "The Digital Twin",
+    text: "Everyone had a 'Digital Twin', an AI version of themselves to handle boring emails and homework. Leo's Twin started getting better grades than him. Then it started giving *him* advice. This morning, Leo's parents wished his Twin 'Happy Birthday' instead of him.",
+    shorts: [
+      "What was the original purpose of the Digital Twin?",
+      "How did Leo's relationship with his Twin change?",
+      "What is the main fear or warning explored in this story?",
+    ],
+    extended:
+      "Write 100–120 words on the dangers of creating technology that is 'smarter' than us or can replace us.",
+  },
+  {
+    title: "The Goggles of Truth",
+    text: "Sam found old swimming goggles at the local pool. When he put them on, he didn't see people. He saw their 'auras'. His friendly teacher was a nervous grey, and the quiet school captain was a brilliant, shining gold. The scariest part was the man in the suit who had no aura at all.",
+    shorts: [
+      "What special power do the goggles have?",
+      "What does Sam learn about the people around him?",
+      "Why is the man with 'no aura' the scariest part?",
+    ],
+    extended:
+      "Write 100–120 words explaining whether it would be a good or a bad thing to know what everyone is *really* like.",
+  },
+  {
+    title: "The Last Puddle",
+    text: "After the long drought, only one puddle was left in the city park. It never evaporated. Kids said that if you looked into it, you didn't see your reflection. You saw a green world, with a blue sky, and two suns. Then, one day, a hand reached out of it.",
+    shorts: [
+      "What is special about the last puddle?",
+      "What do people see when they look into it?",
+      "How does the story's mood change in the final sentence?",
+    ],
+    extended:
+      "In 100–120 words, describe what the hand might want and what might happen next in the story.",
+  },
+  {
+    title: "The Suggestion Box",
+    text: "The new smart fridge suggested recipes. Then it suggested exercises. Then it started suggesting new friends based on what you ate. It became a problem when it sent an email to the whole family: 'Based on recent consumption, I suggest you ask Ben about his secret.'",
+    shorts: [
+      "How did the fridge's suggestions change over time?",
+      "What line did the smart fridge cross?",
+      "What is the story saying about 'smart' technology and privacy?",
+    ],
+    extended:
+      "Write 100–120 words on where the line is between 'helpful' technology and 'invasive' technology.",
+  },
+  {
+    title: "The Lost Sound",
+    text: "An old radio in the garage didn't play music. It played sounds from the past. A broken cup, a first word, a lost dog's bark. One day, it played a sound from *tomorrow*—a smoke alarm, and someone shouting.",
+    shorts: [
+      "What makes the old radio special?",
+      "How does the author build tension at the end?",
+      "What does the final sound imply?",
+    ],
+    extended:
+      "In 100–120 words, explain how a single sound can tell a whole story or create strong emotions.",
+  },
+  {
+    title: "The Moss that Thinks",
+    text: "In the deep forest, a bright green moss grew in perfect circles. Scientists found it communicated using tiny electrical pulses, like a brain. When they tried to take a sample, the entire forest went silent. The birds, the insects... everything.",
+    shorts: [
+      "What is unusual about the moss?",
+      "What happens when the scientists interfere?",
+      "What mood does the ending of the story create?",
+    ],
+    extended:
+      "Write 100–120 words on whether humans should study and interfere with everything in nature, or if some things should be left alone.",
+  },
+  {
+    title: "The Seed of Yesterday",
+    text: "A shop sold seeds that grew in seconds. The catch: they didn't grow into plants, they grew into *memories*. Plant one, and you could re-watch your last birthday. A boy planted one to see his lost grandfather, but he didn't realize that watering it too much made the memory grow over the present.",
+    shorts: [
+      "What do the special seeds grow into?",
+      "Why would someone want to plant one?",
+      "What is the danger or risk of using the seeds?",
+    ],
+    extended:
+      "Write 100–120 words on why living in past memories can be a problem for someone's present life.",
+  },
+  {
+    title: "The Charcoal Map",
+    text: "A street artist drew a map of the city on the pavement with charcoal. When he added a new street to the drawing, a real alleyway would appear in the city. It all went wrong when he got angry and smudged the hospital, and the real building vanished.",
+    shorts: [
+      "What magical power does the artist's map have?",
+      "What causes the power to become dangerous?",
+      "How does this story blend reality and fantasy?",
+    ],
+    extended:
+      "Write 100–120 words on the responsibility that comes with having great power or talent.",
+  },
+];
+
+// 20 Informative Passages
+const informative: Passage[] = [
+  // --- Original 10 ---
+  {
+    title: "The Octopus Engineer",
+    text: "Marine biologists recently discovered an octopus that collects shiny metal scraps from the seabed to build a dome‑like shelter. Cameras captured it carefully adjusting the pieces to reflect light into its den. Scientists believe the octopus may be using reflection to scare away predators or attract prey. The discovery shows how animal intelligence adapts in creative ways, inspiring new underwater robotics.",
+    shorts: [
+      "What problem was the octopus solving?",
+      "Why do scientists think reflection helps it survive?",
+      "How could this inspire engineers?",
+    ],
+    extended:
+      "In 100–120 words, explain how animal behaviour can inspire human technology. Use evidence from the passage.",
+  },
+  {
+    title: "Jellyfish in Space",
+    text: "In 1991, NASA scientists decided to send jellyfish polyps into space aboard the Space Shuttle Columbia. The goal was to learn how weightlessness might affect balance and growth in animals. By the end of the mission, more than 2,000 jellyfish had been born in orbit. When they returned to Earth, the space‑born jellyfish couldn’t swim properly under gravity because their balance organs formed differently.",
+    shorts: [
+      "Why did scientists send jellyfish into space?",
+      "What was unusual about the jellyfish born in orbit?",
+      "How did this experiment help future astronauts?",
+    ],
+    extended:
+      "Write 100–120 words explaining why scientists study simple animals like jellyfish to understand human challenges in space. Use evidence from the text.",
+  },
+  {
+    title: "How Bees Use Vibrations to Talk",
+    text: "Bees are famous for their dances, but they also communicate using tiny vibrations. When a bee lands on a flower, it can send short bursts of buzzing through the petals. Other bees detect these vibrations through their legs and antennae. Scientists discovered these signals can tell bees how much pollen a flower holds or warn that another bee has already visited.",
+    shorts: [
+      "What do bees communicate through vibrations?",
+      "How is this different from the bee dance?",
+      "Why is studying bee communication important for humans?",
+    ],
+    extended:
+      "In 100–120 words, describe how learning from bees could inspire new technologies or ways to share information.",
+  },
+  {
+    title: "Volcano Sensors",
+    text: "Scientists now place egg‑sized sensors near active volcanoes to detect tremors and heat changes. These devices send data to satellites, warning nearby towns hours before eruptions. Some are solar‑powered and can survive lava temperatures for a few minutes—long enough to send critical information.",
+    shorts: [
+      "What do the sensors measure?",
+      "How do they help communities?",
+      "Why must they survive extreme heat?",
+    ],
+    extended:
+      "Write 100–120 words describing how science helps protect people from natural disasters. Use examples from the passage.",
+  },
+  {
+    title: "Glow‑in‑the‑Dark Plants",
+    text: "Researchers have created plants that glow at night by adding special enzymes found in fireflies. The light is soft but bright enough to replace small garden lamps. Scientists hope the discovery could reduce electricity use and help study how plants store energy.",
+    shorts: [
+      "How did scientists make the plants glow?",
+      "What benefits could glowing plants have?",
+      "Why is this discovery important?",
+    ],
+    extended:
+      "Write 100–120 words explaining how science can make the world more sustainable. Use examples from the passage.",
+  },
+  {
+    title: "Robot Farmers",
+    text: "In some farms, small robots now plant seeds, water crops, and pick ripe fruit. They use sensors to measure soil health and cameras to spot weeds. Farmers say the robots help save water and reduce waste while working day and night without rest.",
+    shorts: [
+      "What tasks do robot farmers perform?",
+      "How do they help human farmers?",
+      "What are some drawbacks of relying on robots?",
+    ],
+    extended:
+      "Write 100–120 words discussing how technology is changing the way we grow food. Use evidence from the passage.",
+  },
+  {
+    title: "Plastic‑Eating Bacteria",
+    text: "A group of Japanese scientists discovered bacteria that can break down plastic bottles in just a few weeks. These microbes use enzymes to digest the plastic and turn it into harmless materials. This finding could help solve the world’s plastic‑pollution problem.",
+    shorts: [
+      "What can these bacteria do?",
+      "Why is this discovery useful?",
+      "How could this change recycling in the future?",
+    ],
+    extended:
+      "Write 100–120 words explaining how nature can help humans fix environmental problems. Use examples from the text.",
+  },
+  {
+    title: "Sky Gardens",
+    text: "Cities are adding gardens to rooftops and skyscrapers to clean the air and keep buildings cooler. These sky gardens also attract birds and bees, creating habitats in the middle of the city. Some buildings collect rainwater to keep the plants healthy year‑round.",
+    shorts: [
+      "Why are sky gardens built?",
+      "How do they benefit the environment?",
+      "What makes them different from normal gardens?",
+    ],
+    extended:
+      "Write 100–120 words explaining how urban design can help the planet. Use examples from the text.",
+  },
+  {
+    title: "Ocean Cleanup Drones",
+    text: "Solar‑powered drones patrol the oceans, scooping up floating plastic waste. They use cameras and AI to avoid sea life while collecting rubbish. One drone can collect over a thousand kilograms of plastic per week, sending it to recycling plants on shore.",
+    shorts: [
+      "What problem do these drones solve?",
+      "How do they avoid harming marine animals?",
+      "Why are solar panels useful for this work?",
+    ],
+    extended:
+      "Write 100–120 words describing how innovation can protect the ocean. Use evidence from the passage.",
+  },
+  {
+    title: "Space Gardens",
+    text: "Astronauts on the International Space Station grow lettuce, tomatoes, and radishes in small hydroponic systems. These plants provide fresh food and oxygen. Scientists hope to grow entire greenhouses on Mars using recycled water and LED light.",
+    shorts: [
+      "Why do astronauts grow food in space?",
+      "What challenges do they face?",
+      "How could this research help future missions?",
+    ],
+    extended:
+      "Write 100–120 words explaining why growing plants in space is important for human exploration.",
+  },
+  // --- New 10 ---
+  {
+    title: "Spider Silk Steel",
+    text: "Spider silk is, pound for pound, five times stronger than steel. Scientists have been unable to 'farm' spiders, as they are territorial. Now, researchers have inserted the silk-making genes into bacteria. These microbes can be grown in large vats to produce raw silk protein, which can then be spun into super-strong, lightweight, and biodegradable fibres for medicine and engineering.",
+    shorts: [
+      "Why is spider silk a desirable material?",
+      "Why can't we just 'farm' spiders for their silk?",
+      "What is the new scientific solution to produce the silk?",
+    ],
+    extended:
+      "In 100–120 words, describe two different products that could be improved by using this new spider silk material.",
+  },
+  {
+    title: "Geothermal Power",
+    text: "Geothermal energy uses heat from the Earth's core. In places like Iceland, hot water and steam from deep underground are piped directly to turbines to generate electricity. This power source is highly reliable, as it doesn't depend on wind or sun, and it runs 24/7. Engineers are now developing 'enhanced' systems to create geothermal power even in places without natural hot springs.",
+    shorts: [
+      "What is geothermal energy?",
+      "What are two major advantages of this power source?",
+      "How might this technology be used in more places in the future?",
+    ],
+    extended:
+      "Write 100–120 words explaining why it is important for countries to develop multiple different sources of renewable energy.",
+  },
+  {
+    title: "The 'Phantom Buzz' Effect",
+    text: "Many people experience 'phantom vibration syndrome'—the feeling that your phone is buzzing in your pocket when it isn't. Studies suggest this is a 'learned' reflex. Our brains have become so hyper-aware of potential alerts that we misinterpret other signals, like a muscle twitch or clothing rustle, as a notification. It shows how deeply technology has rewired our physical senses.",
+    shorts: [
+      "What is 'phantom vibration syndrome'?",
+      "What do scientists believe causes this feeling?",
+      "What does this syndrome show about technology's effect on us?",
+    ],
+    extended:
+      "In 100–120 words, discuss one or two other ways you think mobile phones have changed daily human behaviour.",
+  },
+  {
+    title: "Termite-Inspired Buildings",
+    text: "In Africa, termites build giant mounds with complex ventilation systems that keep the inside temperature stable, even in extreme heat. Architects are studying these mounds to design 'self-cooling' buildings. By using a similar system of vents, shafts, and 'thermal chimneys', a building can draw in cool air and push hot air out without using electric air conditioning.",
+    shorts: [
+      "What problem have termites solved in their mounds?",
+      "How do their mounds stay cool?",
+      "How is this idea being used in human architecture?",
+    ],
+    extended:
+      "Write 100–120 words explaining the benefits of 'biomimicry' (copying nature's designs) in engineering and design.",
+  },
+  {
+    title: "Solar Sails",
+    text: "A solar sail is a new form of spacecraft propulsion. It doesn't use rocket fuel. Instead, it uses a huge, thin, reflective sheet—like a giant mirror—to catch the pressure from sunlight itself. Photons (particles of light) bounce off the sail, giving it a tiny push. Over time, this constant, gentle push can accelerate a craft to incredible speeds, perfect for long-distance missions.",
+    shorts: [
+      "What does a solar sail use for power instead of fuel?",
+      "How does the sail make the spacecraft move?",
+      "What kind of space mission is this technology good for?",
+    ],
+    extended:
+      "In 100–120 words, discuss the challenges and benefits of long-distance space exploration.",
+  },
+  {
+    title: "AI in Medical Diagnosis",
+    text: "Artificial intelligence is now being used to read medical scans like X-rays and MRIs. In many trials, AI models can spot tiny signs of diseases, like early-stage cancer, that a human radiologist might miss. The AI isn't replacing doctors; it's acting as a second pair of 'eyes', flagging potential problem areas. This partnership between human experts and AI leads to faster, more accurate diagnoses.",
+    shorts: [
+      "What is one new use of AI in medicine?",
+      "What is the main advantage of using AI for this task?",
+      "How is the AI working *with* doctors, not replacing them?",
+    ],
+    extended:
+      "Write 100–120 words discussing how this technology could make healthcare faster and more accessible for everyone.",
+  },
+  {
+    title: "Fog Catchers",
+    text: "In dry regions like the Atacama Desert in Chile, there is very little rain but a lot of fog rolling in from the ocean. Local communities have built 'fog catchers'—large nets stretched between poles. As the fog passes through, tiny water droplets are trapped by the mesh and trickle down into collection pipes. This simple, low-cost technology can provide clean drinking and irrigation water for entire villages.",
+    shorts: [
+      "What problem do 'fog catchers' solve?",
+      "Where is this technology most useful?",
+      "How does this simple device work?",
+    ],
+    extended:
+      "In 100–120 words, explain how a simple, low-tech solution can sometimes be better than a complex, high-tech one.",
+  },
+  {
+    title: "LIDAR Archaeology",
+    text: "LIDAR is a technology that works like radar, but uses laser light instead of radio waves. From an aeroplane or drone, scientists can send billions of laser pulses to the ground. By measuring the return signals, they can create a 3D map of the terrain, 'seeing' through dense jungle canopies. This has allowed archaeologists to discover entire lost cities, roads, and farms in areas like the Amazon.",
+    shorts: [
+      "What is LIDAR?",
+      "How does it help archaeologists 'see' through jungles?",
+      "What can be discovered using this method?",
+    ],
+    extended:
+      "Write 100–120 words on why discovering 'lost cities' and ancient farms is still important for understanding our world today.",
+  },
+  {
+    title: "Tardigrades: The 'Water Bears'",
+    text: "Tardigrades, also known as 'water bears', are microscopic animals famous for their extreme resilience. They can survive being frozen in ice, boiled in water, dried out for a decade, and even the vacuum and radiation of outer space. They do this by entering a state of suspended animation called 'cryptobiosis', where they expel all water from their bodies and shut down their metabolism.",
+    shorts: [
+      "What is another name for tardigrades?",
+      "What is their special survival state called?",
+      "Name two extreme conditions they can survive.",
+    ],
+    extended:
+      "In 100–120 words, explain what scientists could learn from tardigrades to help with human challenges (like space travel or medicine).",
+  },
+  {
+    title: "Li-Fi (Light Fidelity)",
+    text: "While Wi-Fi uses radio waves to transmit data, a new technology called Li-Fi uses visible light from LED bulbs. A tiny chip in the bulb flashes the light at speeds too fast for the human eye to see, but a receiver on a laptop can read this 'Morse code' as data. Li-Fi is potentially 100 times faster than Wi-Fi and is more secure, as the light cannot pass through walls.",
+    shorts: [
+      "What is the main difference between Li-Fi and Wi-Fi?",
+      "How does Li-Fi transmit data?",
+      "What are two major advantages of Li-Fi?",
+    ],
+    extended:
+      "In 100–120 words, describe one place or situation where Li-Fi would be much more useful than Wi-Fi, and explain why.",
+  },
+];
+
 export default function ExcerptQuestionsTool() {
   // ---------------- UI STATE ----------------
   const [mode, setMode] = useState<"narrative" | "informative">("narrative");
@@ -12,263 +472,11 @@ export default function ExcerptQuestionsTool() {
   const [shorts, setShorts] = useState<[string, string, string]>(["", "", ""]);
   const [extended, setExtended] = useState<string>("");
 
-  // ---------------- DATA ----------------
-  type Passage = {
-    title: string;
-    text: string;
-    shorts: [string, string, string];
-    extended: string;
-  };
-
-  // 10 Narrative Passages
-  const narrative: Passage[] = [
-    {
-      title: "The Library Drone",
-      text:
-        "Each morning, the drone buzzed through the school library, returning books that had gone missing. It could recognise handwriting, sort books by smell, and whisper overdue reminders through the vents. No one questioned how it knew who borrowed what—until one day it returned a book that no one remembered writing.",
-      shorts: [
-        "What makes the library drone unusual?",
-        "How does the story create mystery?",
-        "Why might a book appear that no one remembers writing?",
-      ],
-      extended:
-        "Write 100–120 words describing how technology can become part of our imagination. Use details from the story.",
-    },
-    {
-      title: "The Night Janitor (Model J-3)",
-      text:
-        "The museum hired a cleaning robot to polish the floors after closing. Model J-3 moved like a patient stingray, gliding beneath the glass cases. Its sensors mapped every corner except the dark patch near the meteorite display. On Wednesday night, the security guard watched J-3 pause there, as if listening. In the morning, the floor shone everywhere else, but around the meteorite were tiny footprints the size of sunflower seeds, circling the base.",
-      shorts: [
-        "What unusual detail makes the scene mysterious?",
-        "Explain why J-3 might avoid the patch near the meteorite.",
-        "Name one word or phrase that helps create the mood.",
-      ],
-      extended:
-        "Write 100–120 words debating whether the guard should report J‑3’s behaviour or keep observing. Give reasons for your choice.",
-    },
-    {
-      title: "The Book Vending Machine",
-      text:
-        "When the old tuckshop closed for the term, the principal wheeled in a bright blue vending machine. Instead of lemonade cans, it was filled with little books wrapped in paper. The only way to unlock a book was to earn a golden token from a teacher. By recess a crowd formed, guessing the hidden titles. No one noticed the tiny camera in the corner until it blinked.",
-      shorts: [
-        "What is the main idea in one sentence?",
-        "Find a word/phrase that suggests the machine might be more than a regular machine.",
-        "Why might the machine drop a book without a token?",
-      ],
-      extended:
-        "Write 100–120 words exploring whether rewards (like tokens) make reading more exciting or less authentic. Use an example from your experience.",
-    },
-    {
-      title: "The Clock in the Attic",
-      text:
-        "When Maya wound the clock, the house changed. The air smelled like her grandmother’s perfume, and the photos on the wall showed people she didn’t recognise. Each tick echoed like a heartbeat—faster, louder. Maya realised the hands didn’t mark hours: they marked memories, and one of them wasn’t hers.",
-      shorts: [
-        "What changes when Maya winds the clock?",
-        "How does the author create tension?",
-        "Why might the clock control memories?",
-      ],
-      extended:
-        "Write 100–120 words explaining how objects can hold memories or emotions. Use details from the passage.",
-    },
-    {
-      title: "Under the Oval",
-      text:
-        "During sports practice, the ground under Liam’s feet trembled. A hatch had appeared beneath the goalposts. Inside, a tunnel glowed blue. He crawled in, expecting dirt walls. Instead, there were metal panels labelled ‘Week 42’. His name was written underneath in tiny letters.",
-      shorts: [
-        "What detail makes the story mysterious?",
-        "Why might Liam’s name be written there?",
-        "Predict what will happen next and justify your idea.",
-      ],
-      extended:
-        "In 100–120 words, describe what Liam might discover if he explores further. Use sensory details.",
-    },
-    {
-      title: "The Whispering Backpack",
-      text:
-        "Zara’s backpack began whispering during maths class. It told her which answers were right before she finished the problem. By lunch, it started giving life advice—some good, some strange. When it whispered ‘don’t go home tonight’, she zipped it shut and wondered who had programmed it.",
-      shorts: [
-        "What makes this story unusual?",
-        "How does the backpack’s behaviour change?",
-        "Why does Zara feel uneasy by the end?",
-      ],
-      extended:
-        "Write 100–120 words exploring whether technology that ‘helps’ us can also control us. Use examples from the story.",
-    },
-    {
-      title: "The Dream Ticket",
-      text:
-        "At the funfair, Leo won a golden ticket that read: ‘Redeem for One Real Dream’. That night he placed it under his pillow. When he woke, his dream had spilled into his room—rainbow sand, distant music, and a creature watching him from the window.",
-      shorts: [
-        "What makes the dream seem real?",
-        "What emotions might Leo feel?",
-        "Why is the creature significant?",
-      ],
-      extended:
-        "Write 100–120 words explaining whether dreams can reveal what we really want. Use details from the text.",
-    },
-    {
-      title: "The Substitute",
-      text:
-        "When the relief teacher arrived, no one recognised her. She called everyone by their nicknames, solved equations without writing them down, and drew a chalk door on the board that smelled of eucalyptus. When the bell rang, she stepped through it and vanished.",
-      shorts: [
-        "What clues suggest the substitute isn’t ordinary?",
-        "What mood does the ending create?",
-        "Why might she have visited the class?",
-      ],
-      extended:
-        "In 100–120 words, describe what lesson the students might have learned from the substitute’s visit.",
-    },
-    {
-      title: "The Sky Painter",
-      text:
-        "A girl on the mountain painted clouds with colours that changed the weather. When she used too much blue, the town flooded. When she tried yellow, crops grew overnight. One morning, she woke to find the sky blank—someone had stolen her brush.",
-      shorts: [
-        "What power does the painter have?",
-        "What problems does her art cause?",
-        "Why is the missing brush important?",
-      ],
-      extended:
-        "Write 100–120 words describing how creativity can both build and destroy. Use examples from the story.",
-    },
-    {
-      title: "The Forgotten Playground",
-      text:
-        "Behind the new school building stood an old playground, fenced off and covered in vines. At sunset, the swings began to move on their own. A faint laughter echoed—children from a time before the school existed. Each night, one more vine disappeared.",
-      shorts: [
-        "What evidence suggests the playground is haunted?",
-        "Why might the laughter grow stronger?",
-        "How does the author build suspense?",
-      ],
-      extended:
-        "Write 100–120 words explaining whether the playground should be reopened. Use evidence from the story.",
-    },
-  ];
-
-  // 10 Informative Passages
-  const informative: Passage[] = [
-    {
-      title: "The Octopus Engineer",
-      text:
-        "Marine biologists recently discovered an octopus that collects shiny metal scraps from the seabed to build a dome‑like shelter. Cameras captured it carefully adjusting the pieces to reflect light into its den. Scientists believe the octopus may be using reflection to scare away predators or attract prey. The discovery shows how animal intelligence adapts in creative ways, inspiring new underwater robotics.",
-      shorts: [
-        "What problem was the octopus solving?",
-        "Why do scientists think reflection helps it survive?",
-        "How could this inspire engineers?",
-      ],
-      extended:
-        "In 100–120 words, explain how animal behaviour can inspire human technology. Use evidence from the passage.",
-    },
-    {
-      title: "Jellyfish in Space",
-      text:
-        "In 1991, NASA scientists decided to send jellyfish polyps into space aboard the Space Shuttle Columbia. The goal was to learn how weightlessness might affect balance and growth in animals. By the end of the mission, more than 2,000 jellyfish had been born in orbit. When they returned to Earth, the space‑born jellyfish couldn’t swim properly under gravity because their balance organs formed differently.",
-      shorts: [
-        "Why did scientists send jellyfish into space?",
-        "What was unusual about the jellyfish born in orbit?",
-        "How did this experiment help future astronauts?",
-      ],
-      extended:
-        "Write 100–120 words explaining why scientists study simple animals like jellyfish to understand human challenges in space. Use evidence from the text.",
-    },
-    {
-      title: "How Bees Use Vibrations to Talk",
-      text:
-        "Bees are famous for their dances, but they also communicate using tiny vibrations. When a bee lands on a flower, it can send short bursts of buzzing through the petals. Other bees detect these vibrations through their legs and antennae. Scientists discovered these signals can tell bees how much pollen a flower holds or warn that another bee has already visited.",
-      shorts: [
-        "What do bees communicate through vibrations?",
-        "How is this different from the bee dance?",
-        "Why is studying bee communication important for humans?",
-      ],
-      extended:
-        "In 100–120 words, describe how learning from bees could inspire new technologies or ways to share information.",
-    },
-    {
-      title: "Volcano Sensors",
-      text:
-        "Scientists now place egg‑sized sensors near active volcanoes to detect tremors and heat changes. These devices send data to satellites, warning nearby towns hours before eruptions. Some are solar‑powered and can survive lava temperatures for a few minutes—long enough to send critical information.",
-      shorts: [
-        "What do the sensors measure?",
-        "How do they help communities?",
-        "Why must they survive extreme heat?",
-      ],
-      extended:
-        "Write 100–120 words describing how science helps protect people from natural disasters. Use examples from the passage.",
-    },
-    {
-      title: "Glow‑in‑the‑Dark Plants",
-      text:
-        "Researchers have created plants that glow at night by adding special enzymes found in fireflies. The light is soft but bright enough to replace small garden lamps. Scientists hope the discovery could reduce electricity use and help study how plants store energy.",
-      shorts: [
-        "How did scientists make the plants glow?",
-        "What benefits could glowing plants have?",
-        "Why is this discovery important?",
-      ],
-      extended:
-        "Write 100–120 words explaining how science can make the world more sustainable. Use examples from the passage.",
-    },
-    {
-      title: "Robot Farmers",
-      text:
-        "In some farms, small robots now plant seeds, water crops, and pick ripe fruit. They use sensors to measure soil health and cameras to spot weeds. Farmers say the robots help save water and reduce waste while working day and night without rest.",
-      shorts: [
-        "What tasks do robot farmers perform?",
-        "How do they help human farmers?",
-        "What are some drawbacks of relying on robots?",
-      ],
-      extended:
-        "Write 100–120 words discussing how technology is changing the way we grow food. Use evidence from the passage.",
-    },
-    {
-      title: "Plastic‑Eating Bacteria",
-      text:
-        "A group of Japanese scientists discovered bacteria that can break down plastic bottles in just a few weeks. These microbes use enzymes to digest the plastic and turn it into harmless materials. This finding could help solve the world’s plastic‑pollution problem.",
-      shorts: [
-        "What can these bacteria do?",
-        "Why is this discovery useful?",
-        "How could this change recycling in the future?",
-      ],
-      extended:
-        "Write 100–120 words explaining how nature can help humans fix environmental problems. Use examples from the text.",
-    },
-    {
-      title: "Sky Gardens",
-      text:
-        "Cities are adding gardens to rooftops and skyscrapers to clean the air and keep buildings cooler. These sky gardens also attract birds and bees, creating habitats in the middle of the city. Some buildings collect rainwater to keep the plants healthy year‑round.",
-      shorts: [
-        "Why are sky gardens built?",
-        "How do they benefit the environment?",
-        "What makes them different from normal gardens?",
-      ],
-      extended:
-        "Write 100–120 words explaining how urban design can help the planet. Use examples from the text.",
-    },
-    {
-      title: "Ocean Cleanup Drones",
-      text:
-        "Solar‑powered drones patrol the oceans, scooping up floating plastic waste. They use cameras and AI to avoid sea life while collecting rubbish. One drone can collect over a thousand kilograms of plastic per week, sending it to recycling plants on shore.",
-      shorts: [
-        "What problem do these drones solve?",
-        "How do they avoid harming marine animals?",
-        "Why are solar panels useful for this work?",
-      ],
-      extended:
-        "Write 100–120 words describing how innovation can protect the ocean. Use evidence from the passage.",
-    },
-    {
-      title: "Space Gardens",
-      text:
-        "Astronauts on the International Space Station grow lettuce, tomatoes, and radishes in small hydroponic systems. These plants provide fresh food and oxygen. Scientists hope to grow entire greenhouses on Mars using recycled water and LED light.",
-      shorts: [
-        "Why do astronauts grow food in space?",
-        "What challenges do they face?",
-        "How could this research help future missions?",
-      ],
-      extended:
-        "Write 100–120 words explaining why growing plants in space is important for human exploration.",
-    },
-  ];
-
-  const pool = mode === "narrative" ? narrative : informative;
+  // ---------------- LOGIC ----------------
+  const pool = useMemo(
+    () => (mode === "narrative" ? narrative : informative),
+    [mode]
+  );
 
   useEffect(() => {
     // Initialise with a random passage on mount and on mode change
@@ -276,11 +484,11 @@ export default function ExcerptQuestionsTool() {
     setPassage(pool[idx]);
     setShorts(["", "", ""]);
     setExtended("");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode]);
+  }, [pool]); // Depend on the memoized pool
 
   // ---------------- HELPERS ----------------
-  const wordCount = (t: string) => (t ? t.trim().split(/\s+/).filter(Boolean).length : 0);
+  const wordCount = (t: string) =>
+    t ? t.trim().split(/\s+/).filter(Boolean).length : 0;
   const extWords = useMemo(() => wordCount(extended || ""), [extended]);
   const withinRange = extWords >= 100 && extWords <= 120;
 
@@ -305,8 +513,13 @@ export default function ExcerptQuestionsTool() {
       <div className="max-w-6xl mx-auto p-3 md:p-4">
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-3">
           <div>
-            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Excerpt & Questions — Years 4–9</h1>
-            <p className="text-sm text-neutral-400">Narrative or Informative. Left: passage. Right: 3 short answers + 1 extended (100–120 words).</p>
+            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">
+              Excerpt & Questions — Years 4–9
+            </h1>
+            <p className="text-sm text-neutral-400">
+              Narrative or Informative. Left: passage. Right: 3 short answers + 1
+              extended (100–120 words).
+            </p>
           </div>
           <div className="flex gap-2">
             <select
@@ -317,23 +530,36 @@ export default function ExcerptQuestionsTool() {
               <option value="narrative">Narrative</option>
               <option value="informative">Informative</option>
             </select>
-            <button onClick={newRandomPassage} className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm">New Passage</button>
+            <button
+              onClick={newRandomPassage}
+              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm"
+            >
+              New Passage
+            </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
           <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow-sm flex flex-col max-h-[70vh]">
-            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">Passage</div>
+            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">
+              Passage
+            </div>
             <h2 className="text-lg font-medium mb-2">{passage.title}</h2>
-            <p className="text-neutral-200 leading-relaxed text-[15px] whitespace-pre-wrap overflow-auto pr-1">{passage.text}</p>
+            <p className="text-neutral-200 leading-relaxed text-[15px] whitespace-pre-wrap overflow-auto pr-1">
+              {passage.text}
+            </p>
           </div>
 
           <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow-sm max-h-[70vh] overflow-auto">
-            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">Questions</div>
+            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">
+              Questions
+            </div>
 
             {passage.shorts.map((q, i) => (
               <div key={i} className="mb-3">
-                <label className="block text-sm font-medium mb-1">Q{i + 1}. {q}</label>
+                <label className="block text-sm font-medium mb-1">
+                  Q{i + 1}. {q}
+                </label>
                 <input
                   type="text"
                   value={shorts[i]}
@@ -349,37 +575,28 @@ export default function ExcerptQuestionsTool() {
             ))}
 
             <div className="mt-4">
-              <label className="block text-sm font-semibold mb-1">Extended Response (100–120 words)</label>
-              <p className="text-sm text-neutral-400 mb-1">{passage.extended}</p>
+              <label className="block text-sm font-semibold mb-1">
+                Extended Response (100–120 words)
+              </label>
+              <p className="text-sm text-neutral-400 mb-1">
+                {passage.extended}
+              </p>
               <textarea
                 value={extended}
                 onChange={(e) => setExtended(e.target.value)}
                 placeholder="Write here…"
                 className="w-full h-36 bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-[15px] leading-6 focus:outline-none focus:ring-2 focus:ring-blue-600"
               ></textarea>
-              <div className="text-xs mt-1 text-neutral-400">{extWords} words {withinRange ? "✔ within range" : "(target 100–120)"}</div>
+              <div className="text-xs mt-1 text-neutral-400">
+                {extWords} words{" "}
+                {withinRange
+                  ? "✔ within range"
+                  : "(target 100–120)"}
+              </div>
             </div>
           </div>
         </div>
-
-        <DevTests />
       </div>
     </div>
   );
-}
-
-// ---------------- DEV TESTS ----------------
-function DevTests() {
-  useEffect(() => {
-    const wc = (s: string) => (s ? s.trim().split(/\s+/).filter(Boolean).length : 0);
-    console.assert(wc("") === 0, "wordCount empty should be 0");
-    console.assert(wc("one") === 1, "wordCount single word should be 1");
-    console.assert(wc("two  words") === 2, "wordCount collapses spaces");
-    const mk = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
-    console.assert(wc(mk(99)) === 99, "99 words check");
-    console.assert(wc(mk(100)) === 100, "100 words check");
-    console.assert(wc(mk(120)) === 120, "120 words check");
-    console.assert(wc(mk(121)) === 121, "121 words check");
-  }, []);
-  return null;
 }
