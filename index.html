@@ -1,128 +1,385 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+
+// Y4–9 Excerpt + Questions (compact)
+// This file is a self-contained React component for the canvas/runtime.
+// It replaces the earlier standalone-HTML version that caused a syntax error
+// (the DOCTYPE/HTML tags are invalid inside a TSX/JSX module).
 
 export default function ExcerptQuestionsTool() {
-  const [mode, setMode] = useState("narrative");
-  const [passage, setPassage] = useState(null);
-  const [shorts, setShorts] = useState(["", "", ""]);
-  const [extended, setExtended] = useState("");
+  // ---------------- UI STATE ----------------
+  const [mode, setMode] = useState<"narrative" | "informative">("narrative");
+  const [passage, setPassage] = useState<Passage | null>(null);
+  const [shorts, setShorts] = useState<[string, string, string]>(["", "", ""]);
+  const [extended, setExtended] = useState<string>("");
 
-  const randomIndex = (arr) => Math.floor(Math.random() * arr.length);
+  // ---------------- DATA ----------------
+  type Passage = {
+    title: string;
+    text: string;
+    shorts: [string, string, string];
+    extended: string;
+  };
 
-  // 20 Narrative Passages
-  const narrativePassages = [
-    { title: "The Library Drone", text: "Each morning, the drone buzzed through the school library, returning books that had gone missing. It could recognise handwriting, sort books by smell, and whisper overdue reminders through the vents. No one questioned how it knew who borrowed what—until one day it returned a book that no one remembered writing.", shorts: ["What makes the library drone unusual?", "How does the story create mystery?", "Why might a book appear that no one remembers writing?"], extended: "Write 100–120 words describing how technology can become part of our imagination. Use details from the story." },
-    { title: "The Night Janitor (Model J-3)", text: "The museum hired a cleaning robot to polish the floors after closing. Model J-3 moved like a patient stingray, gliding beneath the glass cases. Its sensors mapped every corner except the dark patch near the meteorite display. On Wednesday night, the security guard watched J-3 pause there, as if listening. In the morning, the floor shone everywhere else, but around the meteorite were tiny footprints the size of sunflower seeds, circling the base.", shorts: ["What unusual detail makes the scene mysterious?", "Explain why J-3 might avoid the patch near the meteorite.", "What mood does the writer create? Name one word or phrase that helps."], extended: "Write 100–120 words debating whether the guard should report J-3’s behaviour or keep observing. Give reasons for your choice." },
-    { title: "The Book Vending Machine", text: "When the old tuckshop closed for the term, the principal wheeled in a bright blue vending machine. Instead of lemonade cans, it was filled with little books wrapped in paper. The only way to unlock a book was to earn a golden token from a teacher.", shorts: ["What is the main idea of this passage?", "How does the vending machine make reading more fun?", "Why might students keep returning to the machine?"], extended: "Write 100–120 words explaining whether rewards make learning more exciting or less authentic. Use an example from your experience." },
-    { title: "The Clock in the Attic", text: "When Maya wound the clock, the house changed. The air smelled like her grandmother’s perfume, and the photos on the wall showed people she didn’t recognise. Each tick echoed like a heartbeat.", shorts: ["What happens when Maya winds the clock?", "What details create suspense?", "Why might the clock control memories?"], extended: "Write 100–120 words exploring how objects can hold memories or emotions. Use details from the passage." },
-    { title: "Under the Oval", text: "During sports practice, the ground under Liam’s feet trembled. A hatch had appeared beneath the goalposts. Inside, a tunnel glowed blue. He crawled in, expecting dirt walls. Instead, there were metal panels labelled ‘Week 42’. His name was written underneath in tiny letters.", shorts: ["What detail makes the story mysterious?", "Why might Liam’s name be written there?", "Predict what might happen next."], extended: "Write 100–120 words describing what Liam might discover underground. Use sensory detail." },
-    { title: "The Whispering Backpack", text: "Zara’s backpack began whispering during maths class. It told her which answers were right before she finished the problem. By lunch, it started giving life advice—some good, some strange. When it whispered ‘don’t go home tonight’, she zipped it shut.", shorts: ["What makes this story unusual?", "How does Zara react?", "Why does she become uneasy?"], extended: "Write 100–120 words exploring how helpful technology might go too far. Use examples from the story." },
-    { title: "The Dream Ticket", text: "At the funfair, Leo won a golden ticket that read: ‘Redeem for One Real Dream’. That night he placed it under his pillow. When he woke, his dream had spilled into his room—rainbow sand, distant music, and a creature watching from the window.", shorts: ["What makes the dream seem real?", "What emotions might Leo feel?", "Why is the creature significant?"], extended: "Write 100–120 words explaining what dreams reveal about our wishes. Use details from the text." },
-    { title: "The Substitute", text: "When the relief teacher arrived, no one recognised her. She called everyone by their nicknames, solved equations without writing them down, and drew a chalk door that smelled of eucalyptus.", shorts: ["What clues suggest the substitute isn’t ordinary?", "What mood does the ending create?", "Why might she have visited the class?"], extended: "Write 100–120 words describing what lesson the students might have learned." },
-    { title: "The Sky Painter", text: "A girl on the mountain painted clouds with colours that changed the weather. When she used too much blue, the town flooded. When she tried yellow, crops grew overnight.", shorts: ["What power does the painter have?", "What problems does her art cause?", "Why is the missing brush important?"], extended: "Write 100–120 words describing how creativity can both build and destroy. Use examples from the story." },
-    { title: "The Forgotten Playground", text: "Behind the new school stood an old playground, fenced off and covered in vines. At sunset, the swings began to move on their own. A faint laughter echoed—children from a time before the school existed.", shorts: ["What evidence suggests the playground is haunted?", "Why might the laughter grow stronger?", "How does the author build suspense?"], extended: "Write 100–120 words explaining whether the playground should be reopened. Use evidence from the story." }
+  // 10 Narrative Passages
+  const narrative: Passage[] = [
+    {
+      title: "The Library Drone",
+      text:
+        "Each morning, the drone buzzed through the school library, returning books that had gone missing. It could recognise handwriting, sort books by smell, and whisper overdue reminders through the vents. No one questioned how it knew who borrowed what—until one day it returned a book that no one remembered writing.",
+      shorts: [
+        "What makes the library drone unusual?",
+        "How does the story create mystery?",
+        "Why might a book appear that no one remembers writing?",
+      ],
+      extended:
+        "Write 100–120 words describing how technology can become part of our imagination. Use details from the story.",
+    },
+    {
+      title: "The Night Janitor (Model J-3)",
+      text:
+        "The museum hired a cleaning robot to polish the floors after closing. Model J-3 moved like a patient stingray, gliding beneath the glass cases. Its sensors mapped every corner except the dark patch near the meteorite display. On Wednesday night, the security guard watched J-3 pause there, as if listening. In the morning, the floor shone everywhere else, but around the meteorite were tiny footprints the size of sunflower seeds, circling the base.",
+      shorts: [
+        "What unusual detail makes the scene mysterious?",
+        "Explain why J-3 might avoid the patch near the meteorite.",
+        "Name one word or phrase that helps create the mood.",
+      ],
+      extended:
+        "Write 100–120 words debating whether the guard should report J‑3’s behaviour or keep observing. Give reasons for your choice.",
+    },
+    {
+      title: "The Book Vending Machine",
+      text:
+        "When the old tuckshop closed for the term, the principal wheeled in a bright blue vending machine. Instead of lemonade cans, it was filled with little books wrapped in paper. The only way to unlock a book was to earn a golden token from a teacher. By recess a crowd formed, guessing the hidden titles. No one noticed the tiny camera in the corner until it blinked.",
+      shorts: [
+        "What is the main idea in one sentence?",
+        "Find a word/phrase that suggests the machine might be more than a regular machine.",
+        "Why might the machine drop a book without a token?",
+      ],
+      extended:
+        "Write 100–120 words exploring whether rewards (like tokens) make reading more exciting or less authentic. Use an example from your experience.",
+    },
+    {
+      title: "The Clock in the Attic",
+      text:
+        "When Maya wound the clock, the house changed. The air smelled like her grandmother’s perfume, and the photos on the wall showed people she didn’t recognise. Each tick echoed like a heartbeat—faster, louder. Maya realised the hands didn’t mark hours: they marked memories, and one of them wasn’t hers.",
+      shorts: [
+        "What changes when Maya winds the clock?",
+        "How does the author create tension?",
+        "Why might the clock control memories?",
+      ],
+      extended:
+        "Write 100–120 words explaining how objects can hold memories or emotions. Use details from the passage.",
+    },
+    {
+      title: "Under the Oval",
+      text:
+        "During sports practice, the ground under Liam’s feet trembled. A hatch had appeared beneath the goalposts. Inside, a tunnel glowed blue. He crawled in, expecting dirt walls. Instead, there were metal panels labelled ‘Week 42’. His name was written underneath in tiny letters.",
+      shorts: [
+        "What detail makes the story mysterious?",
+        "Why might Liam’s name be written there?",
+        "Predict what will happen next and justify your idea.",
+      ],
+      extended:
+        "In 100–120 words, describe what Liam might discover if he explores further. Use sensory details.",
+    },
+    {
+      title: "The Whispering Backpack",
+      text:
+        "Zara’s backpack began whispering during maths class. It told her which answers were right before she finished the problem. By lunch, it started giving life advice—some good, some strange. When it whispered ‘don’t go home tonight’, she zipped it shut and wondered who had programmed it.",
+      shorts: [
+        "What makes this story unusual?",
+        "How does the backpack’s behaviour change?",
+        "Why does Zara feel uneasy by the end?",
+      ],
+      extended:
+        "Write 100–120 words exploring whether technology that ‘helps’ us can also control us. Use examples from the story.",
+    },
+    {
+      title: "The Dream Ticket",
+      text:
+        "At the funfair, Leo won a golden ticket that read: ‘Redeem for One Real Dream’. That night he placed it under his pillow. When he woke, his dream had spilled into his room—rainbow sand, distant music, and a creature watching him from the window.",
+      shorts: [
+        "What makes the dream seem real?",
+        "What emotions might Leo feel?",
+        "Why is the creature significant?",
+      ],
+      extended:
+        "Write 100–120 words explaining whether dreams can reveal what we really want. Use details from the text.",
+    },
+    {
+      title: "The Substitute",
+      text:
+        "When the relief teacher arrived, no one recognised her. She called everyone by their nicknames, solved equations without writing them down, and drew a chalk door on the board that smelled of eucalyptus. When the bell rang, she stepped through it and vanished.",
+      shorts: [
+        "What clues suggest the substitute isn’t ordinary?",
+        "What mood does the ending create?",
+        "Why might she have visited the class?",
+      ],
+      extended:
+        "In 100–120 words, describe what lesson the students might have learned from the substitute’s visit.",
+    },
+    {
+      title: "The Sky Painter",
+      text:
+        "A girl on the mountain painted clouds with colours that changed the weather. When she used too much blue, the town flooded. When she tried yellow, crops grew overnight. One morning, she woke to find the sky blank—someone had stolen her brush.",
+      shorts: [
+        "What power does the painter have?",
+        "What problems does her art cause?",
+        "Why is the missing brush important?",
+      ],
+      extended:
+        "Write 100–120 words describing how creativity can both build and destroy. Use examples from the story.",
+    },
+    {
+      title: "The Forgotten Playground",
+      text:
+        "Behind the new school building stood an old playground, fenced off and covered in vines. At sunset, the swings began to move on their own. A faint laughter echoed—children from a time before the school existed. Each night, one more vine disappeared.",
+      shorts: [
+        "What evidence suggests the playground is haunted?",
+        "Why might the laughter grow stronger?",
+        "How does the author build suspense?",
+      ],
+      extended:
+        "Write 100–120 words explaining whether the playground should be reopened. Use evidence from the story.",
+    },
   ];
 
-  // 20 Informative Passages
-  const informativePassages = [
-    { title: "The Octopus Engineer", text: "Marine biologists recently discovered an octopus that collects shiny metal scraps from the seabed to build a dome-like shelter. Cameras captured it carefully adjusting the pieces to reflect light into its den.", shorts: ["What problem was the octopus solving?", "Why do scientists think reflection helps it survive?", "How could this inspire engineers?"], extended: "Write 100–120 words explaining how animal behaviour can inspire technology." },
-    { title: "Jellyfish in Space", text: "In 1991, NASA scientists sent jellyfish polyps into space to see how weightlessness affected growth and balance. Over 2,000 were born in orbit, but when they returned to Earth, they couldn’t swim properly.", shorts: ["Why did scientists send jellyfish into space?", "What was unusual about the jellyfish born in orbit?", "How did this help future astronauts?"], extended: "Write 100–120 words explaining why scientists study simple creatures to understand humans." },
-    { title: "How Bees Talk", text: "Bees communicate through tiny vibrations in flowers. These signals tell others how much pollen is available or whether a flower has already been visited.", shorts: ["What do bees communicate?", "How is this different from the bee dance?", "Why is it important to humans?"], extended: "Write 100–120 words explaining how studying bees can help technology and farming." },
-    { title: "Volcano Sensors", text: "Scientists now place small sensors near volcanoes to detect tremors and heat. These devices send data to satellites, warning towns before eruptions.", shorts: ["What do sensors measure?", "How do they help people?", "Why must they survive extreme heat?"], extended: "Write 100–120 words explaining how science helps protect people from disasters." },
-    { title: "Glow-in-the-Dark Plants", text: "Researchers made plants glow at night using firefly enzymes. The soft light could replace small lamps and reduce electricity use.", shorts: ["How did scientists make the plants glow?", "What benefits could glowing plants have?", "Why is this discovery important?"], extended: "Write 100–120 words explaining how innovation can make life sustainable." },
-    { title: "Robot Farmers", text: "Robots on farms now plant seeds, water crops, and pick ripe fruit. They use sensors to measure soil health and cameras to spot weeds.", shorts: ["What tasks do robot farmers perform?", "How do they help human farmers?", "What are the downsides of using robots?"], extended: "Write 100–120 words discussing how robots change the way we grow food." },
-    { title: "Plastic-Eating Bacteria", text: "Japanese scientists discovered bacteria that can digest plastic bottles in weeks. These microbes could help reduce pollution.", shorts: ["What can these bacteria do?", "Why is this discovery useful?", "How could this change recycling?"], extended: "Write 100–120 words explaining how nature might solve pollution problems." },
-    { title: "Sky Gardens", text: "Cities are adding gardens to rooftops to clean air and cool buildings. These gardens attract birds and bees, creating city habitats.", shorts: ["Why are sky gardens built?", "How do they help the environment?", "What makes them different from normal gardens?"], extended: "Write 100–120 words explaining how urban design can help the planet." },
-    { title: "Ocean Cleanup Drones", text: "Solar-powered drones patrol oceans, collecting floating plastic waste. They use cameras and AI to avoid marine life while working.", shorts: ["What problem do these drones solve?", "How do they avoid harming animals?", "Why is solar power useful?"], extended: "Write 100–120 words explaining how innovation can protect oceans." },
-    { title: "Space Gardens", text: "Astronauts on the ISS grow lettuce and tomatoes in hydroponic systems. Scientists hope this research will help grow food on Mars.", shorts: ["Why do astronauts grow food in space?", "What challenges do they face?", "How could this research help future missions?"], extended: "Write 100–120 words explaining why growing food in space matters." }
+  // 10 Informative Passages
+  const informative: Passage[] = [
+    {
+      title: "The Octopus Engineer",
+      text:
+        "Marine biologists recently discovered an octopus that collects shiny metal scraps from the seabed to build a dome‑like shelter. Cameras captured it carefully adjusting the pieces to reflect light into its den. Scientists believe the octopus may be using reflection to scare away predators or attract prey. The discovery shows how animal intelligence adapts in creative ways, inspiring new underwater robotics.",
+      shorts: [
+        "What problem was the octopus solving?",
+        "Why do scientists think reflection helps it survive?",
+        "How could this inspire engineers?",
+      ],
+      extended:
+        "In 100–120 words, explain how animal behaviour can inspire human technology. Use evidence from the passage.",
+    },
+    {
+      title: "Jellyfish in Space",
+      text:
+        "In 1991, NASA scientists decided to send jellyfish polyps into space aboard the Space Shuttle Columbia. The goal was to learn how weightlessness might affect balance and growth in animals. By the end of the mission, more than 2,000 jellyfish had been born in orbit. When they returned to Earth, the space‑born jellyfish couldn’t swim properly under gravity because their balance organs formed differently.",
+      shorts: [
+        "Why did scientists send jellyfish into space?",
+        "What was unusual about the jellyfish born in orbit?",
+        "How did this experiment help future astronauts?",
+      ],
+      extended:
+        "Write 100–120 words explaining why scientists study simple animals like jellyfish to understand human challenges in space. Use evidence from the text.",
+    },
+    {
+      title: "How Bees Use Vibrations to Talk",
+      text:
+        "Bees are famous for their dances, but they also communicate using tiny vibrations. When a bee lands on a flower, it can send short bursts of buzzing through the petals. Other bees detect these vibrations through their legs and antennae. Scientists discovered these signals can tell bees how much pollen a flower holds or warn that another bee has already visited.",
+      shorts: [
+        "What do bees communicate through vibrations?",
+        "How is this different from the bee dance?",
+        "Why is studying bee communication important for humans?",
+      ],
+      extended:
+        "In 100–120 words, describe how learning from bees could inspire new technologies or ways to share information.",
+    },
+    {
+      title: "Volcano Sensors",
+      text:
+        "Scientists now place egg‑sized sensors near active volcanoes to detect tremors and heat changes. These devices send data to satellites, warning nearby towns hours before eruptions. Some are solar‑powered and can survive lava temperatures for a few minutes—long enough to send critical information.",
+      shorts: [
+        "What do the sensors measure?",
+        "How do they help communities?",
+        "Why must they survive extreme heat?",
+      ],
+      extended:
+        "Write 100–120 words describing how science helps protect people from natural disasters. Use examples from the passage.",
+    },
+    {
+      title: "Glow‑in‑the‑Dark Plants",
+      text:
+        "Researchers have created plants that glow at night by adding special enzymes found in fireflies. The light is soft but bright enough to replace small garden lamps. Scientists hope the discovery could reduce electricity use and help study how plants store energy.",
+      shorts: [
+        "How did scientists make the plants glow?",
+        "What benefits could glowing plants have?",
+        "Why is this discovery important?",
+      ],
+      extended:
+        "Write 100–120 words explaining how science can make the world more sustainable. Use examples from the passage.",
+    },
+    {
+      title: "Robot Farmers",
+      text:
+        "In some farms, small robots now plant seeds, water crops, and pick ripe fruit. They use sensors to measure soil health and cameras to spot weeds. Farmers say the robots help save water and reduce waste while working day and night without rest.",
+      shorts: [
+        "What tasks do robot farmers perform?",
+        "How do they help human farmers?",
+        "What are some drawbacks of relying on robots?",
+      ],
+      extended:
+        "Write 100–120 words discussing how technology is changing the way we grow food. Use evidence from the passage.",
+    },
+    {
+      title: "Plastic‑Eating Bacteria",
+      text:
+        "A group of Japanese scientists discovered bacteria that can break down plastic bottles in just a few weeks. These microbes use enzymes to digest the plastic and turn it into harmless materials. This finding could help solve the world’s plastic‑pollution problem.",
+      shorts: [
+        "What can these bacteria do?",
+        "Why is this discovery useful?",
+        "How could this change recycling in the future?",
+      ],
+      extended:
+        "Write 100–120 words explaining how nature can help humans fix environmental problems. Use examples from the text.",
+    },
+    {
+      title: "Sky Gardens",
+      text:
+        "Cities are adding gardens to rooftops and skyscrapers to clean the air and keep buildings cooler. These sky gardens also attract birds and bees, creating habitats in the middle of the city. Some buildings collect rainwater to keep the plants healthy year‑round.",
+      shorts: [
+        "Why are sky gardens built?",
+        "How do they benefit the environment?",
+        "What makes them different from normal gardens?",
+      ],
+      extended:
+        "Write 100–120 words explaining how urban design can help the planet. Use examples from the text.",
+    },
+    {
+      title: "Ocean Cleanup Drones",
+      text:
+        "Solar‑powered drones patrol the oceans, scooping up floating plastic waste. They use cameras and AI to avoid sea life while collecting rubbish. One drone can collect over a thousand kilograms of plastic per week, sending it to recycling plants on shore.",
+      shorts: [
+        "What problem do these drones solve?",
+        "How do they avoid harming marine animals?",
+        "Why are solar panels useful for this work?",
+      ],
+      extended:
+        "Write 100–120 words describing how innovation can protect the ocean. Use evidence from the passage.",
+    },
+    {
+      title: "Space Gardens",
+      text:
+        "Astronauts on the International Space Station grow lettuce, tomatoes, and radishes in small hydroponic systems. These plants provide fresh food and oxygen. Scientists hope to grow entire greenhouses on Mars using recycled water and LED light.",
+      shorts: [
+        "Why do astronauts grow food in space?",
+        "What challenges do they face?",
+        "How could this research help future missions?",
+      ],
+      extended:
+        "Write 100–120 words explaining why growing plants in space is important for human exploration.",
+    },
   ];
 
-  const pool = useMemo(() => (mode === "narrative" ? narrativePassages : informativePassages), [mode]);
+  const pool = mode === "narrative" ? narrative : informative;
 
   useEffect(() => {
-    const idx = randomIndex(pool);
+    // Initialise with a random passage on mount and on mode change
+    const idx = Math.floor(Math.random() * pool.length);
     setPassage(pool[idx]);
+    setShorts(["", "", ""]);
+    setExtended("");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
-  const wordCount = (t) => (t ? t.trim().split(/\s+/).filter(Boolean).length : 0);
-  const extWords = useMemo(() => wordCount(extended), [extended]);
+  // ---------------- HELPERS ----------------
+  const wordCount = (t: string) => (t ? t.trim().split(/\s+/).filter(Boolean).length : 0);
+  const extWords = useMemo(() => wordCount(extended || ""), [extended]);
+  const withinRange = extWords >= 100 && extWords <= 120;
 
-  const newPassage = () => {
-    const idx = randomIndex(pool);
+  const newRandomPassage = () => {
+    const idx = Math.floor(Math.random() * pool.length);
     setPassage(pool[idx]);
     setShorts(["", "", ""]);
     setExtended("");
   };
 
+  // ---------------- RENDER ----------------
+  if (!passage) {
+    return (
+      <div className="min-h-screen bg-neutral-950 text-neutral-100 p-4">
+        <div className="max-w-6xl mx-auto">Loading…</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-950 text-white p-6">
-      <div className="max-w-5xl mx-auto">
-        <header className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6">
+    <div className="min-h-screen bg-neutral-950 text-neutral-100">
+      <div className="max-w-6xl mx-auto p-3 md:p-4">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-2 mb-3">
           <div>
-            <h1 className="text-2xl font-bold">Excerpt & Questions — Years 4–9</h1>
-            <p className="text-gray-400 text-sm">Choose Narrative or Informative. Write short and extended responses.</p>
+            <h1 className="text-xl md:text-2xl font-semibold tracking-tight">Excerpt & Questions — Years 4–9</h1>
+            <p className="text-sm text-neutral-400">Narrative or Informative. Left: passage. Right: 3 short answers + 1 extended (100–120 words).</p>
           </div>
-          <div className="flex gap-2 mt-3 md:mt-0">
+          <div className="flex gap-2">
             <select
-              className="bg-gray-800 border border-gray-700 rounded px-2 py-1"
               value={mode}
-              onChange={(e) => {
-                setMode(e.target.value);
-                newPassage();
-              }}
+              onChange={(e) => setMode(e.target.value as typeof mode)}
+              className="bg-neutral-900 border border-neutral-700 rounded-lg px-2 py-1 text-sm"
             >
               <option value="narrative">Narrative</option>
               <option value="informative">Informative</option>
             </select>
-            <button
-              className="bg-blue-600 hover:bg-blue-500 px-3 py-1 rounded"
-              onClick={newPassage}
-            >
-              New Passage
-            </button>
+            <button onClick={newRandomPassage} className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm">New Passage</button>
           </div>
-        </header>
+        </div>
 
-        {passage && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800">
-              <h2 className="text-lg font-semibold mb-2">{passage.title}</h2>
-              <p className="text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{passage.text}</p>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch">
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow-sm flex flex-col max-h-[70vh]">
+            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">Passage</div>
+            <h2 className="text-lg font-medium mb-2">{passage.title}</h2>
+            <p className="text-neutral-200 leading-relaxed text-[15px] whitespace-pre-wrap overflow-auto pr-1">{passage.text}</p>
+          </div>
 
-            <div className="bg-gray-900 rounded-xl p-4 border border-gray-800 overflow-auto">
-              <h3 className="text-sm uppercase tracking-widest text-gray-400 mb-2">Questions</h3>
-              {passage.shorts.map((q, i) => (
-                <div key={i} className="mb-3">
-                  <label className="block text-sm font-medium mb-1">Q{i + 1}. {q}</label>
-                  <input
-                    type="text"
-                    value={shorts[i]}
-                    onChange={(e) => {
-                      const next = [...shorts];
-                      next[i] = e.target.value;
-                      setShorts(next);
-                    }}
-                    placeholder="1–2 sentences"
-                    className="w-full bg-gray-950 border border-gray-700 rounded px-2 py-1 text-sm"
-                  />
-                </div>
-              ))}
+          <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 shadow-sm max-h-[70vh] overflow-auto">
+            <div className="text-xs uppercase tracking-widest text-neutral-400 mb-2">Questions</div>
 
-              <div className="mt-4">
-                <label className="block text-sm font-semibold mb-1">Extended Response (100–120 words)</label>
-                <p className="text-gray-400 text-sm mb-1">{passage.extended}</p>
-                <textarea
-                  value={extended}
-                  onChange={(e) => setExtended(e.target.value)}
-                  placeholder="Write here…"
-                  className="w-full h-36 bg-gray-950 border border-gray-700 rounded px-2 py-1 text-sm"
-                ></textarea>
-                <div className="text-xs text-gray-400 mt-1">{extWords} words (target 100–120)</div>
+            {passage.shorts.map((q, i) => (
+              <div key={i} className="mb-3">
+                <label className="block text-sm font-medium mb-1">Q{i + 1}. {q}</label>
+                <input
+                  type="text"
+                  value={shorts[i]}
+                  onChange={(e) => {
+                    const next = [...shorts] as [string, string, string];
+                    next[i] = e.target.value;
+                    setShorts(next);
+                  }}
+                  placeholder="1–2 sentences"
+                  className="w-full bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-[15px] focus:outline-none focus:ring-2 focus:ring-blue-600"
+                />
               </div>
+            ))}
+
+            <div className="mt-4">
+              <label className="block text-sm font-semibold mb-1">Extended Response (100–120 words)</label>
+              <p className="text-sm text-neutral-400 mb-1">{passage.extended}</p>
+              <textarea
+                value={extended}
+                onChange={(e) => setExtended(e.target.value)}
+                placeholder="Write here…"
+                className="w-full h-36 bg-neutral-950 border border-neutral-700 rounded-xl px-3 py-2 text-[15px] leading-6 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              ></textarea>
+              <div className="text-xs mt-1 text-neutral-400">{extWords} words {withinRange ? "✔ within range" : "(target 100–120)"}</div>
             </div>
           </div>
-        )}
+        </div>
+
+        <DevTests />
       </div>
     </div>
   );
+}
+
+// ---------------- DEV TESTS ----------------
+function DevTests() {
+  useEffect(() => {
+    const wc = (s: string) => (s ? s.trim().split(/\s+/).filter(Boolean).length : 0);
+    console.assert(wc("") === 0, "wordCount empty should be 0");
+    console.assert(wc("one") === 1, "wordCount single word should be 1");
+    console.assert(wc("two  words") === 2, "wordCount collapses spaces");
+    const mk = (n: number) => Array.from({ length: n }, (_, i) => `w${i}`).join(" ");
+    console.assert(wc(mk(99)) === 99, "99 words check");
+    console.assert(wc(mk(100)) === 100, "100 words check");
+    console.assert(wc(mk(120)) === 120, "120 words check");
+    console.assert(wc(mk(121)) === 121, "121 words check");
+  }, []);
+  return null;
 }
